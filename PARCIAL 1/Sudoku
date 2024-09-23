@@ -1,15 +1,19 @@
+import java.io.*;
+import java.util.Random;
 import java.util.Scanner;
- 
-public class Sudoku {
-    private int[][] matriz;
- 
+
+public class Sudoku { // Clase Sudoku: un objeto que representa el juego de Sudoku.
+    private int[][] matriz; // Atributo: matriz que almacena el estado del tablero (9x9).
+    private Random random; // Atributo: objeto Random para generar números aleatorios.
+
     // Constructor para inicializar el tablero vacío
-    public Sudoku() {
-        matriz = new int[9][9];
+    public Sudoku() { // Método constructor: inicializa el objeto Sudoku.
+        matriz = new int[9][9]; // Inicializa la matriz del tablero.
+        random = new Random(); // Inicializa el generador de números aleatorios.
     }
- 
+
     // Método para mostrar el tablero de Sudoku
-    public void mostrarTablero() {
+    public void mostrarTablero() { // Método: muestra el estado actual del tablero.
         System.out.println("Tablero de Sudoku:");
         for (int i = 0; i < 9; i++) {
             if (i % 3 == 0 && i != 0) {
@@ -28,113 +32,133 @@ public class Sudoku {
             System.out.println();
         }
     }
- 
+
     // Método para ingresar un número en una posición específica
-    public boolean ingresarNumero(int fila, int columna, int numero) {
-        if (esPosicionValida(fila, columna) && esNumeroValido(numero)) {
+    public boolean ingresarNumero(int fila, int columna, int numero) { // Método: ingresa un número en la matriz.
+        if (esPosicionValida(fila, columna) && esNumeroValido(numero)) { // Llama a métodos privados para validar.
             if (matriz[fila][columna] != 0) {
                 System.out.println("La celda en la posición (" + fila + "," + columna + ") ya está llena con el número " + matriz[fila][columna] + ".");
                 System.out.print("¿Desea modificar el número? (sí/no): ");
                 Scanner scanner = new Scanner(System.in);
                 String respuesta = scanner.next();
- 
+
                 if (!respuesta.equalsIgnoreCase("sí")) {
-                    return false;
+                    return false; // No modifica si el usuario elige no hacerlo.
                 }
             }
- 
-            if (esValido(fila, columna, numero)) {
-                matriz[fila][columna] = numero;
-                return true;
+
+            if (esValido(fila, columna, numero)) { // Validar si el número se puede colocar.
+                matriz[fila][columna] = numero; // Asigna el número en la matriz.
+                
+                // Verificar si se ha llenado un subcuadro de 3x3
+                if (esSubcuadroLleno(fila, columna)) {
+                    System.out.println("¡Uno de los subcuadros de 3x3 está completamente lleno!");
+                }
+                
+                registrarMovimiento(fila, columna, numero); // Llama a otro método para registrar el movimiento.
+                return true; // Ingreso exitoso.
             } else {
                 System.out.println("Número no válido en la posición (" + fila + "," + columna + "). Verifique las reglas del Sudoku.");
-                return false;
+                return false; // El número no es válido.
             }
         } else {
             System.out.println("Número o posición inválida. Asegúrese de que el número esté entre 1 y 9 y las posiciones entre 0 y 8.");
-            return false;
+            return false; // La posición o número es inválido.
         }
     }
- 
+
     // Validar si la posición es válida
-    private boolean esPosicionValida(int fila, int columna) {
-        return fila >= 0 && fila < 9 && columna >= 0 && columna < 9;
+    private boolean esPosicionValida(int fila, int columna) { // Método privado: verifica si la posición es válida.
+        return fila >= 0 && fila < 9 && columna >= 0 && columna < 9; // Verifica límites.
     }
- 
+
     // Validar si el número es válido
-    private boolean esNumeroValido(int numero) {
-        return numero >= 1 && numero <= 9;
+    private boolean esNumeroValido(int numero) { // Método privado: verifica si el número está en el rango válido.
+        return numero >= 1 && numero <= 9; // Retorna true si está en rango.
     }
- 
+
     // Método para validar que el número no se repita en la fila, columna o subcuadro 3x3
-    private boolean esValido(int fila, int columna, int numero) {
+    private boolean esValido(int fila, int columna, int numero) { // Método privado: valida el número en el contexto del Sudoku.
         return !esNumeroEnFila(fila, numero) &&
                !esNumeroEnColumna(columna, numero) &&
                !esNumeroEnSubcuadro(fila, columna, numero);
     }
- 
-    private boolean esNumeroEnFila(int fila, int numero) {
-        for (int j = 0; j < 9; j++) {
-            if (matriz[fila][j] == numero) {
-                return true;
-            }
-        }
-        return false;
-    }
- 
-    private boolean esNumeroEnColumna(int columna, int numero) {
-        for (int i = 0; i < 9; i++) {
-            if (matriz[i][columna] == numero) {
-                return true;
-            }
-        }
-        return false;
-    }
- 
-    private boolean esNumeroEnSubcuadro(int fila, int columna, int numero) {
-        int inicioFila = (fila / 3) * 3;
-        int inicioColumna = (columna / 3) * 3;
-        for (int i = inicioFila; i < inicioFila + 3; i++) {
-            for (int j = inicioColumna; j < inicioColumna + 3; j++) {
-                if (matriz[i][j] == numero) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
- 
+
+    // Métodos privados para verificar la existencia del número en fila, columna y subcuadro
+    private boolean esNumeroEnFila(int fila, int numero) { /* ... */ }
+    private boolean esNumeroEnColumna(int columna, int numero) { /* ... */ }
+    private boolean esNumeroEnSubcuadro(int fila, int columna, int numero) { /* ... */ }
+
+    // Método para verificar si un subcuadro 3x3 está completamente lleno
+    private boolean esSubcuadroLleno(int fila, int columna) { /* ... */ }
+
+    // Método para llenar el tablero con una cantidad aleatoria de números válidos
+    public void llenarTableroConNumerosAleatorios(int cantidad) { /* ... */ }
+
+    // Método para registrar cada movimiento en un archivo
+    private void registrarMovimiento(int fila, int columna, int numero) { /* ... */ }
+
+    // Método para guardar el estado completo del tablero en un archivo
+    private void guardarTablero() { /* ... */ }
+
+    // Método para cargar el estado del tablero desde un archivo
+    public void cargarTablero() { /* ... */ }
+
+    // Método para reproducir la última partida guardada paso a paso
+    public void reproducirPartida() { /* ... */ }
+
     // Método principal para jugar al Sudoku
-    public static void main(String[] args) {
-        Sudoku sudoku = new Sudoku();
+    public static void main(String[] args) { // Método estático: punto de entrada del programa.
         Scanner scanner = new Scanner(System.in);
+        Sudoku sudoku = new Sudoku(); // Creación de un objeto Sudoku.
+
+        System.out.println("Elija una opción:");
+        // Menú para el usuario
+        int opcion = scanner.nextInt();
+
+        if (opcion == 2) {
+            System.out.print("¿Cuántos números aleatorios desea generar? (entre 9 y 21): ");
+            int cantidad = scanner.nextInt();
+            // Asegúrate de que la cantidad esté dentro del rango permitido
+            cantidad = Math.max(9, Math.min(cantidad, 21));
+            sudoku.llenarTableroConNumerosAleatorios(cantidad); // Llama al método para llenar el tablero.
+        } else if (opcion == 3) {
+            sudoku.cargarTablero(); // Carga el tablero guardado.
+        } else if (opcion == 4) {
+            sudoku.reproducirPartida(); // Reproduce la última partida.
+            scanner.close();
+            return;
+        }
+
         boolean jugar = true;
- 
+
         while (jugar) {
-            sudoku.mostrarTablero();
- 
+            sudoku.mostrarTablero(); // Muestra el tablero actual.
+
             System.out.print("Ingrese la fila (0-8): ");
             int fila = scanner.nextInt();
- 
+
             System.out.print("Ingrese la columna (0-8): ");
             int columna = scanner.nextInt();
- 
+
             System.out.print("Ingrese el número (1-9): ");
             int numero = scanner.nextInt();
- 
-            boolean ingresoExitoso = sudoku.ingresarNumero(fila, columna, numero);
+
+            boolean ingresoExitoso = sudoku.ingresarNumero(fila, columna, numero); // Llama al método para ingresar un número.
             if (!ingresoExitoso) {
-                System.out.println("Intento fallido. Intente de nuevo.");
+                System.out.println("Intento fallido. Intente de nuevo."); // Mensaje de error.
             }
- 
+
             System.out.print("¿Desea continuar? (sí/no): ");
             String respuesta = scanner.next();
             if (respuesta.equalsIgnoreCase("no")) {
-                jugar = false;
+                jugar = false; // Salir del bucle si el usuario no desea continuar.
             }
         }
- 
+
+        // Guardar el estado final del tablero al finalizar la partida
+        sudoku.guardarTablero(); // Guarda el estado final del tablero.
         scanner.close();
-        System.out.println("¡Gracias por jugar al Sudoku!");
+        System.out.println("¡Gracias por jugar al Sudoku!"); // Mensaje final.
     }
 }
