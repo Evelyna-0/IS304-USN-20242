@@ -45,18 +45,18 @@ def mostrar_bajos():
 # Función principal para interactuar con el usuario
 def main():
     while True:
-        comando = input("\nIngrese un comando (ej. 'agregar \"manzana\" 10' o 'salir'): ").strip().lower()
+        comando = input("\nIngrese un comando (ej. 'agregar manzana 10' o 'salir'): ").strip().lower()
         
         if comando == 'salir':
             print("Saliendo del programa...")
             break
         
-        partes = comando.split('"')
+        partes = comando.split()
         
-        if len(partes) == 3:  # Asegurarse de que haya 2 comillas
-            accion = partes[0].strip()
-            producto = partes[1].strip()
-            cantidad_str = partes[2].strip()
+        if len(partes) == 3:  # Asegurarse de que haya 3 partes
+            accion = partes[0]
+            producto = partes[1]
+            cantidad_str = partes[2]
 
             try:
                 cantidad = int(cantidad_str)
