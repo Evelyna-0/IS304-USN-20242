@@ -1,81 +1,70 @@
-# Inicialización de inventario
-productos = ['manzana', 'naranja', 'pera', 'uva']  # Lista de productos
-stock = {producto: 0 for producto in productos}  # Diccionario para el stock
-bajos = set()  # Conjunto para productos con bajo stock
-bajo_limite = 5  # Límite para bajo stock
+# Diccionario para almacenar productos y sus cantidades
+inventario = {}
 
-def agregar_producto(producto, cantidad):
-    if producto in productos:
-        stock[producto] += cantidad
-        print(f"Se han agregado {cantidad} unidades de {producto}.")
-        verificar_bajo_stock(producto)
+# Función para agregar un producto al inventario
+def agregar_producto(nombre, cantidad):
+    if nombre in inventario:
+        inventario[nombre] += cantidad
     else:
-        print("Producto no válido.")
+        inventario[nombre] = cantidad
 
-def eliminar_producto(producto, cantidad):
-    if producto in productos:
-        if stock[producto] >= cantidad:
-            stock[producto] -= cantidad
-            print(f"Se han eliminado {cantidad} unidades de {producto}.")
-            verificar_bajo_stock(producto)
+# Función para eliminar una cantidad específica de un producto
+def eliminar_producto(nombre, cantidad):
+    if nombre in inventario:
+        if inventario[nombre] > cantidad:
+            inventario[nombre] -= cantidad
         else:
-            print(f"No hay suficientes unidades de {producto} para eliminar.")
-    else:
-        print("Producto no válido.")
+            inventario[nombre] = 0
 
-def verificar_bajo_stock(producto):
-    if stock[producto] < bajo_limite:
-        bajos.add(producto)
-    else:
-        bajos.discard(producto)
+# Función para mostrar productos con cantidades bajas
+def verificar_bajas(cantidad_minima):
+    productos_bajos = {k: v for k, v in inventario.items() if v < cantidad_minima}
+    print(f'Productos con cantidad menor a {cantidad_minima}: {list(productos_bajos.keys())}')
 
+# Función para mostrar el inventario completo, ordenado alfabéticamente
 def mostrar_inventario():
-    print("\nInventario actual:")
-    for producto in productos:
-        if stock[producto] > 0:  # Solo mostrar productos con stock
-            print(f"{producto.capitalize()}: {stock[producto]}")
+    print("Inventario:")
+    for producto in sorted(inventario.keys()):
+        print(f'{producto}: {inventario[producto]}')
 
-def mostrar_bajos():
-    print("\nProductos con menos de 5 unidades:")
-    if bajos:
-        for producto in bajos:
-            print(f"{producto.capitalize()}: {stock[producto]}")
-    else:
-        print("No hay productos bajos en stock.")
-
-# Función principal para interactuar con el usuario
-def main():
+# Función principal del programa que acepta comandos en línea
+def gestionar_inventario():
     while True:
-        comando = input("\nIngrese un comando (ej. 'agregar manzana 10' o 'salir'): ").strip().lower()
-        
-        if comando == 'salir':
-            print("Saliendo del programa...")
-            break
-        
+        comando = input()  # Captura la entrada del usuario
         partes = comando.split()
+
+        if len(partes) == 0:
+            continue
+
+        accion = partes[0].lower()
+
+        try:
+            if accion == 'agregar' and len(partes) == 3:
+                nombre = partes[1]
+                cantidad = int(partes[2])
+                agregar_producto(nombre, cantidad)
+
+            elif accion == 'eliminar' and len(partes) == 3:
+                nombre = partes[1]
+                cantidad = int(partes[2])
+                eliminar_producto(nombre, cantidad)
+
+            elif accion == 'mostrar' and len(partes) == 2 and partes[1].lower() == 'inventario':
+                mostrar_inventario()
+
+            elif accion == 'productos_bajos' and len(partes) == 2:
+                cantidad_minima = int(partes[1])
+                verificar_bajas(cantidad_minima)
+
+            elif accion == 'salir':
+                break
+
+            else:
+                print("Comando no reconocido. Intente de nuevo.")
         
-        if len(partes) == 3:  # Asegurarse de que haya 3 partes
-            accion = partes[0]
-            producto = partes[1]
-            cantidad_str = partes[2]
-
-            try:
-                cantidad = int(cantidad_str)
-                
-                if accion == 'agregar':
-                    agregar_producto(producto, cantidad)
-                elif accion == 'eliminar':
-                    eliminar_producto(producto, cantidad)
-                else:
-                    print("Acción no válida. Use 'agregar' o 'eliminar'.")
-            except ValueError:
-                print("La cantidad debe ser un número entero.")
-        else:
-            print("Comando no válido. Asegúrese de usar el formato correcto.")
-
-        mostrar_inventario()
-        mostrar_bajos()
+        except ValueError:
+            print("Error: asegúrate de ingresar cantidades válidas.")
 
 # Ejecutar el programa
 if __name__ == "__main__":
-    main()
+    gestionar_inventario()
