@@ -32,7 +32,8 @@ def verificar_bajo_stock(producto):
 def mostrar_inventario():
     print("\nInventario actual:")
     for producto in productos:
-        print(f"{producto.capitalize()}: {stock[producto]}")
+        if stock[producto] > 0:  # Solo mostrar productos con stock
+            print(f"{producto.capitalize()}: {stock[producto]}")
 
 def mostrar_bajos():
     print("\nProductos con menos de 5 unidades:")
